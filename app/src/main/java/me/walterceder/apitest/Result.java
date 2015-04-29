@@ -1,9 +1,15 @@
 package me.walterceder.apitest;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 public class Result extends ActionBarActivity {
@@ -12,6 +18,35 @@ public class Result extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result);
+        Intent intent = getIntent();
+        String results = intent.getStringExtra("json");
+        EditText et = (EditText)findViewById(R.id.editText2);
+        String stuff = "";
+        et.setText(results);
+        try {
+            JSONArray jArray = new JSONArray(results);
+            //http://stackoverflow.com/questions/9605913/how-to-parse-json-in-android
+            JSONObject name = jArray.getJSONObject(0);
+            stuff=stuff+name.getString("inspection_business_name");
+            for (int i=0; i < jArray.length(); i++)
+            {
+                try {
+                    JSONObject oneObject = jArray.getJSONObject(i);
+                    // Pulling items from the array
+                    String oneObjectsItem = oneObject.getString("inspection_date");
+                    String oneObjectsItem2 = oneObject.getString("inspection_result");
+                    String oneObjectsItem3 = oneObject.getString("violation_description");
+                    String oneObjectsItem4 = oneObject.getString("violation_type");
+
+                    stuff = stuff+oneObjectsItem+"\n"+oneObjectsItem2+"\n"+oneObjectsItem3+"\n"+oneObjectsItem4+"\n";
+                } catch (JSONException e) {
+                    // Oops
+                }
+            }
+            et.setText(stuff);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
 

@@ -41,6 +41,7 @@ public class MainActivity extends Activity implements OnClickListener, LocationL
     private boolean searching = true; //if the search is ongoing
     private double lat5= 0.0000018;
     private double lng5= 0.0000018;
+    Intent intent;
 
 
     @Override
@@ -49,7 +50,7 @@ public class MainActivity extends Activity implements OnClickListener, LocationL
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-
+        intent = new Intent(this,Result.class);
         findViewById(R.id.button).setOnClickListener(this);
         latituteField = (TextView) findViewById(R.id.latituteField);
         longitudeField = (TextView) findViewById(R.id.longitudeField);
@@ -87,7 +88,7 @@ public class MainActivity extends Activity implements OnClickListener, LocationL
         Button b = (Button)findViewById(R.id.button);
 
         b.setClickable(false);
-
+        b.setText("Loading");
 
 
             new LongRunningGetIO().execute();
@@ -209,10 +210,12 @@ public class MainActivity extends Activity implements OnClickListener, LocationL
 
         protected void onPostExecute(String results) {
             if (results!=null) {
+                intent.putExtra("json",results);
+                startActivity(intent);
                 //!!!!!!
-                EditText et = (EditText)findViewById(R.id.editText);
+                //EditText et = (EditText)findViewById(R.id.editText);
 
-                et.setText(results);
+                //et.setText(results);
 
             }
 
