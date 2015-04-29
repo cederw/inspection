@@ -1,7 +1,10 @@
 package me.walterceder.apitest;
 
+        import java.io.BufferedReader;
         import java.io.IOException;
         import java.io.InputStream;
+        import java.io.InputStreamReader;
+
         import org.apache.http.HttpEntity;
         import org.apache.http.HttpResponse;
         import org.apache.http.client.HttpClient;
@@ -18,6 +21,7 @@ package me.walterceder.apitest;
         import android.os.AsyncTask;
         import android.os.Bundle;
         import android.provider.Settings;
+        import android.util.Log;
         import android.view.View;
         import android.view.View.OnClickListener;
         import android.widget.Button;
@@ -31,6 +35,13 @@ public class MainActivity extends Activity implements OnClickListener, LocationL
     private TextView longitudeField;
     private LocationManager locationManager;
     private String provider = "";
+    private double lat;
+    private double lng;
+    private int offset = 0;
+    private boolean searching = true; //if the search is ongoing
+    private double lat5= 0.0000018;
+    private double lng5= 0.0000018;
+
 
     @Override
 
@@ -45,6 +56,8 @@ public class MainActivity extends Activity implements OnClickListener, LocationL
          locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         Criteria criteria = new Criteria();
         provider = locationManager.getBestProvider(criteria, false);
+
+
 
         boolean enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
@@ -74,7 +87,12 @@ public class MainActivity extends Activity implements OnClickListener, LocationL
         Button b = (Button)findViewById(R.id.button);
 
         b.setClickable(false);
-        new LongRunningGetIO().execute();
+
+
+
+            new LongRunningGetIO().execute();
+
+
 
     }
 
@@ -91,8 +109,9 @@ public class MainActivity extends Activity implements OnClickListener, LocationL
     }
     @Override
     public void onLocationChanged(Location location) {
-        double lat =  (location.getLatitude());
-        double lng = (location.getLongitude());
+         lat =  (location.getLatitude());
+         lng = (location.getLongitude());
+        lng5 = 1/((111111.0*Math.cos(lng))*5);
         latituteField.setText(String.valueOf(lat));
         longitudeField.setText(String.valueOf(lng));
     }
@@ -139,22 +158,50 @@ public class MainActivity extends Activity implements OnClickListener, LocationL
         @Override
 
         protected String doInBackground(Void... params) {
-            HttpClient httpClient = new DefaultHttpClient();
+
+
+                    HttpClient httpClient = new DefaultHttpClient();
             HttpContext localContext = new BasicHttpContext();
-            HttpGet httpGet = new HttpGet("https://data.kingcounty.gov/resource/f29f-zza5.json?$where=latitude%20%3E%2047.6250635431%20AND%20latitude%20%3C%2047.7250635431");
             String text = null;
-            try {
+            InputStream inputStream = null;
+            while(text==null||text.equals("[ ]\n")){
+                double minLat = lat-(lat5*offset);
+                double maxLat = lat+(lat5*offset);
+                double minLng = lng-(lng5*offset);
+                double maxLng = lng+(lng5*offset);
+                offset++;
+                String call = "https://data.kingcounty.gov/resource/f29f-zza5.json?$where=latitude%20%3E%20"+minLat+"%20AND%20latitude%20%3C%20"+maxLat+"%20AND%20longitude%20%3C%20"+minLng+"%20AND%20longitude%20%3E%20"+maxLng;
 
-                HttpResponse response = httpClient.execute(httpGet, localContext);
+                HttpGet httpGet = new HttpGet(call);
+                try {
 
-                HttpEntity entity = response.getEntity();
+                    HttpResponse response = httpClient.execute(httpGet, localContext);
 
-                text = getASCIIContentFromEntity(entity);
+                    HttpEntity entity = response.getEntity();
 
-            } catch (Exception e) {
-                return e.getLocalizedMessage();
+                    //text = getASCIIContentFromEntity(entity);
 
+                    inputStream = entity.getContent();
+                    // json is UTF-8 by default
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"), 8);
+                    StringBuilder sb = new StringBuilder();
+
+                    String line = null;
+                    while ((line = reader.readLine()) != null)
+                    {
+                        sb.append(line + "\n");
+                    }
+                    text = sb.toString();
+
+
+                } catch (Exception e) {
+                    return e.getLocalizedMessage();
+
+                }
             }
+
+
+
 
             return text;
 
@@ -162,7 +209,7 @@ public class MainActivity extends Activity implements OnClickListener, LocationL
 
         protected void onPostExecute(String results) {
             if (results!=null) {
-
+                //!!!!!!
                 EditText et = (EditText)findViewById(R.id.editText);
 
                 et.setText(results);

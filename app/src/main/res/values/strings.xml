@@ -4,5 +4,8 @@
     <string name="app_name">APItest</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_splash">Splash</string>
+    <string name="title_activity_result">Result</string>
+    <string name="title_activity_close_places">ClosePlaces</string>
 
 </resources>
