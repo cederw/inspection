@@ -198,6 +198,7 @@ public class MainActivity extends Activity implements OnClickListener, LocationL
                     while ((line = reader.readLine()) != null)
                     {
                         sb.append(line + "\n");
+                        Log.i("DescEarly", line);
                     }
                     text = sb.toString();
 
@@ -260,10 +261,14 @@ public class MainActivity extends Activity implements OnClickListener, LocationL
 
                             JSONObject oneObject = jArray.getJSONObject(i);
                             if(oneObject.getString("inspection_business_name").equals(targetName)){
-                                curr.addDate(oneObject.getString("inspection_date"));
-                                curr.addResult(oneObject.getString("inspection_result"));
-                                curr.addDesc(oneObject.getString("violation_description"));
-                                curr.addType(oneObject.getString("violation_type"));
+                                if(oneObject.has("inspection_date")&&oneObject.has("inspection_result")&&oneObject.has("violation_description")&&oneObject.has("violation_type")){
+                                    curr.addDate(oneObject.getString("inspection_date"));
+                                    curr.addResult(oneObject.getString("inspection_result"));
+                                    curr.addDesc(oneObject.getString("violation_description"));
+                                    Log.i("Desc", oneObject.getString("violation_description"));
+                                    curr.addType(oneObject.getString("violation_type"));
+                                }
+
 
                             }
                             // Pulling items from the array

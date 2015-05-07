@@ -2,6 +2,7 @@ package me.walterceder.apitest;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +58,9 @@ public class locationObj implements Parcelable{
         results.add(result);
     }
     public void addDesc(String de){
+
         desc.add(de);
+
     }
     public void addType(String ty){
         type.add(ty);

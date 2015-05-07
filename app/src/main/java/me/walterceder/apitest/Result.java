@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class Result extends Activity {
+public class Result extends ListActivity {
 
     //LIST OF ARRAY STRINGS WHICH WILL SERVE AS LIST ITEMS
     ArrayList<String> listItems=new ArrayList<String>();
@@ -39,10 +39,11 @@ public class Result extends Activity {
         TextView title = (TextView)findViewById(R.id.textView);
         String stuff = results.getName();
         title.setText(stuff);
-        //adapter=new ArrayAdapter<String>(this,
-       //         android.R.layout.simple_list_item_1,
-       //        listItems);
-       // setListAdapter(adapter);
+
+        adapter=new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1,
+               listItems);
+        setListAdapter(adapter);
 
 
         List dates = results.getDates();
@@ -55,10 +56,13 @@ public class Result extends Activity {
         Log.i("type",type.size()+"");
         //sizes are not always the same
 
-        for(int i = 0; i< 20;i++){
+        for(int i = 0; i< dates.size();i++){
 
-           // listItems.add((String)dates.get(i));
-           // adapter.notifyDataSetChanged();
+            listItems.add((String)dates.get(i));
+            listItems.add((String)result.get(i));
+            listItems.add((String)desc.get(i));
+            listItems.add((String)type.get(i));
+            adapter.notifyDataSetChanged();
 
         }
 
