@@ -12,6 +12,10 @@ package me.walterceder.apitest;
         import org.apache.http.impl.client.DefaultHttpClient;
         import org.apache.http.protocol.BasicHttpContext;
         import org.apache.http.protocol.HttpContext;
+        import org.json.JSONArray;
+        import org.json.JSONException;
+        import org.json.JSONObject;
+
         import android.app.Activity;
         import android.content.Intent;
         import android.location.Criteria;
@@ -24,8 +28,6 @@ package me.walterceder.apitest;
         import android.util.Log;
         import android.view.View;
         import android.view.View.OnClickListener;
-        import android.widget.Button;
-        import android.widget.EditText;
         import android.widget.TextView;
         import android.widget.Toast;
 
@@ -51,9 +53,9 @@ public class MainActivity extends Activity implements OnClickListener, LocationL
 
         setContentView(R.layout.activity_main);
         intent = new Intent(this,Result.class);
-        findViewById(R.id.button).setOnClickListener(this);
-        latituteField = (TextView) findViewById(R.id.latituteField);
-        longitudeField = (TextView) findViewById(R.id.longitudeField);
+       // findViewById(R.id.button).setOnClickListener(this);
+       // latituteField = (TextView) findViewById(R.id.latituteField);
+      //  longitudeField = (TextView) findViewById(R.id.longitudeField);
          locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         Criteria criteria = new Criteria();
         provider = locationManager.getBestProvider(criteria, false);
@@ -71,27 +73,28 @@ public class MainActivity extends Activity implements OnClickListener, LocationL
         }
         Location location = locationManager.getLastKnownLocation(provider);
 
-        // Initialize the location fields
+        // Initialize the locationObj fields
         if (location != null) {
             System.out.println("Provider " + provider + " has been selected.");
             onLocationChanged(location);
         } else {
-            latituteField.setText("Location not available");
-            longitudeField.setText("Location not available");
+       //     latituteField.setText("Location not available");
+       //     longitudeField.setText("Location not available");
         }
+        new LongRunningGetIO().execute();
     }
 
     @Override
 
     public void onClick(View arg0) {
 
-        Button b = (Button)findViewById(R.id.button);
+    //    Button b = (Button)findViewById(R.id.button);
 
-        b.setClickable(false);
-        b.setText("Loading");
+      //  b.setClickable(false);
+     //   b.setText("Loading");
 
 
-            new LongRunningGetIO().execute();
+       //     new LongRunningGetIO().execute();
 
 
 
@@ -113,8 +116,8 @@ public class MainActivity extends Activity implements OnClickListener, LocationL
          lat =  (location.getLatitude());
          lng = (location.getLongitude());
         lng5 = 1/((111111.0*Math.cos(lng))*5);
-        latituteField.setText(String.valueOf(lat));
-        longitudeField.setText(String.valueOf(lng));
+       // latituteField.setText(String.valueOf(lat));
+        //longitudeField.setText(String.valueOf(lng));
     }
     @Override
     public void onProviderEnabled(String provider) {
@@ -165,14 +168,18 @@ public class MainActivity extends Activity implements OnClickListener, LocationL
             HttpContext localContext = new BasicHttpContext();
             String text = null;
             InputStream inputStream = null;
-            while(text==null||text.equals("[ ]\n")){
-                double minLat = lat-(lat5*offset);
-                double maxLat = lat+(lat5*offset);
-                double minLng = lng-(lng5*offset);
-                double maxLng = lng+(lng5*offset);
+            //while(text==null||text.equals("[ ]\n")){
+                //double minLat = lat-(lat5*offset);
+               // double maxLat = lat+(lat5*offset);
+               // double minLng = lng-(lng5*offset);
+               // double maxLng = lng+(lng5*offset);
+                double minLat = lat-(1.0/169);
+                double maxLat = lat+(1.0/169);
+                double minLng = lng+(1.0/169);
+                double maxLng = lng-(1.0/169);
                 offset++;
                 String call = "https://data.kingcounty.gov/resource/f29f-zza5.json?$where=latitude%20%3E%20"+minLat+"%20AND%20latitude%20%3C%20"+maxLat+"%20AND%20longitude%20%3C%20"+minLng+"%20AND%20longitude%20%3E%20"+maxLng;
-
+                Log.i("url",call);
                 HttpGet httpGet = new HttpGet(call);
                 try {
 
@@ -199,7 +206,7 @@ public class MainActivity extends Activity implements OnClickListener, LocationL
                     return e.getLocalizedMessage();
 
                 }
-            }
+            //}
 
 
 
@@ -210,8 +217,71 @@ public class MainActivity extends Activity implements OnClickListener, LocationL
 
         protected void onPostExecute(String results) {
             if (results!=null) {
-                intent.putExtra("json",results);
-                startActivity(intent);
+                String stuff = "";
+
+                try {
+                    JSONArray jArray = new JSONArray(results);
+                    double[] coords = new double[jArray.length()*2];
+                    //http://stackoverflow.com/questions/9605913/how-to-parse-json-in-android
+                    int extra = jArray.length();
+
+                    for (int i=0; i < jArray.length(); i++)
+                    {
+                        try {
+
+                            JSONObject oneObject = jArray.getJSONObject(i);
+                            // Pulling items from the array
+                            coords[i] = oneObject.getDouble("latitude");
+                            coords[i+extra] = oneObject.getDouble("longitude");
+
+                        } catch (JSONException e) {
+                            // Oops
+                        }
+                    }
+
+                    double distance = 10000;
+
+                    int marker = 0;
+                    for(int i=0; i < jArray.length(); i++){
+
+                        double tempD = Math.sqrt(Math.pow(lat-coords[i],2)+Math.pow(lng-coords[i+extra],2));
+                        if(tempD<distance){
+                            distance=  tempD;
+                            marker = i;
+                        }
+
+                    }
+                    JSONObject name = jArray.getJSONObject(marker);
+                    String targetName=name.getString("inspection_business_name");
+                    locationObj curr = new locationObj(targetName);
+                    for (int i=0; i < jArray.length(); i++)
+                    {
+                        try {
+
+                            JSONObject oneObject = jArray.getJSONObject(i);
+                            if(oneObject.getString("inspection_business_name").equals(targetName)){
+                                curr.addDate(oneObject.getString("inspection_date"));
+                                curr.addResult(oneObject.getString("inspection_result"));
+                                curr.addDesc(oneObject.getString("violation_description"));
+                                curr.addType(oneObject.getString("violation_type"));
+
+                            }
+                            // Pulling items from the array
+
+
+                        } catch (JSONException e) {
+                            // Oops
+                        }
+                    }
+                    intent.putExtra("thing",curr);
+                    startActivity(intent);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+                //intent.putExtra("json",results);
+                //startActivity(intent);
                 //!!!!!!
                 //EditText et = (EditText)findViewById(R.id.editText);
 
@@ -219,9 +289,9 @@ public class MainActivity extends Activity implements OnClickListener, LocationL
 
             }
 
-            Button b = (Button)findViewById(R.id.button);
+         //   Button b = (Button)findViewById(R.id.button);
 
-            b.setClickable(true);
+          // b.setClickable(true);
 
         }
 

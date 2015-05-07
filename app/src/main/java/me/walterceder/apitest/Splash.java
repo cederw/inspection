@@ -67,7 +67,7 @@ public class Splash extends Activity implements LocationListener {
         }
         Location location = locationManager.getLastKnownLocation(provider);
 
-        // Initialize the location fields
+        // Initialize the locationObj fields
         if (location != null) {
             System.out.println("Provider " + provider + " has been selected.");
             onLocationChanged(location);

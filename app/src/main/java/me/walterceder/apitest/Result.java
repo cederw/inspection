@@ -1,8 +1,10 @@
 package me.walterceder.apitest;
 
 import android.content.Intent;
+import android.os.Parcelable;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -10,6 +12,8 @@ import android.widget.EditText;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.List;
 
 
 public class Result extends ActionBarActivity {
@@ -19,34 +23,23 @@ public class Result extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result);
         Intent intent = getIntent();
-        String results = intent.getStringExtra("json");
+        locationObj results = (locationObj)intent.getParcelableExtra("thing");
         EditText et = (EditText)findViewById(R.id.editText2);
-        String stuff = "";
-        et.setText(results);
-        try {
-            JSONArray jArray = new JSONArray(results);
-            //http://stackoverflow.com/questions/9605913/how-to-parse-json-in-android
-            JSONObject name = jArray.getJSONObject(0);
-            stuff=stuff+name.getString("inspection_business_name");
-            for (int i=0; i < jArray.length(); i++)
-            {
-                try {
-                    JSONObject oneObject = jArray.getJSONObject(i);
-                    // Pulling items from the array
-                    String oneObjectsItem = oneObject.getString("inspection_date");
-                    String oneObjectsItem2 = oneObject.getString("inspection_result");
-                    String oneObjectsItem3 = oneObject.getString("violation_description");
-                    String oneObjectsItem4 = oneObject.getString("violation_type");
-
-                    stuff = stuff+oneObjectsItem+"\n"+oneObjectsItem2+"\n"+oneObjectsItem3+"\n"+oneObjectsItem4+"\n";
-                } catch (JSONException e) {
-                    // Oops
-                }
-            }
-            et.setText(stuff);
-        } catch (JSONException e) {
-            e.printStackTrace();
+        String stuff = results.getName();
+        List dates = results.getDates();
+        List result = results.getResults();
+        List desc = results.getDesc();
+        List type = results.getType();
+        Log.i("dates",dates.size()+"");
+        Log.i("result",result.size()+"");
+        Log.i("desc",desc.size()+"");
+        Log.i("type",type.size()+"");
+        //sizes are not always the same
+        for(int i = 0; i< 20;i++){
+            stuff = stuff+dates.get(i)+"\n"+result.get(i)+"\n"+desc.get(i)+"\n"+type.get(i)+"\n";
         }
+        et.setText(stuff);
+
     }
 
 
