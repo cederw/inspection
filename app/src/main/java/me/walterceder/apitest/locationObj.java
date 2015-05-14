@@ -10,12 +10,13 @@ import java.util.List;
 /**
  * Created by iguest on 5/6/15.
  */
-public class locationObj implements Parcelable{
+public class locationObj implements Parcelable, Comparable{
     private String name;
     private List dates;
     private List results;
     private List desc;
     private List type;
+    private double distance;
 
     public locationObj(String name) {
         this.name = name;
@@ -23,6 +24,7 @@ public class locationObj implements Parcelable{
         this.results = new ArrayList<String>();
         this.desc = new ArrayList<String>();
         this.type = new ArrayList<String>();
+        distance = 1000.0;
     }
 
     public String getName() {
@@ -50,7 +52,12 @@ public class locationObj implements Parcelable{
     public List getType() {
         return type;
     }
-
+    public double getDistance() {
+        return distance;
+    }
+    public void addDistance(double dis){
+        this.distance = dis;
+    }
     public void addDate(String date){
         dates.add(date);
     }
@@ -78,6 +85,7 @@ public class locationObj implements Parcelable{
         dest.writeList(results);
         dest.writeList(desc);
         dest.writeList(type);
+        dest.writeDouble(distance);
     }
 
     public static final Parcelable.Creator<locationObj> CREATOR = new Parcelable.Creator<locationObj>() {
@@ -100,6 +108,18 @@ public class locationObj implements Parcelable{
         in.readList(desc, null);
         type = new ArrayList<String>();
         in.readList(type, null);
+        this.distance = in.readDouble();
 
+    }
+
+    @Override
+    public int compareTo(Object other) {
+        double comparedist=((locationObj)other).getDistance();
+        /* For Ascending order*/
+        Log.i("dist",this.distance-comparedist+" "+ (int)(this.distance-comparedist));
+        return (int)(this.distance-comparedist);
+
+        /* For Descending order do like this */
+        //return compareage-this.studentage;
     }
 }

@@ -4,6 +4,9 @@ package me.walterceder.apitest;
         import java.io.IOException;
         import java.io.InputStream;
         import java.io.InputStreamReader;
+        import java.util.ArrayList;
+        import java.util.Collections;
+        import java.util.List;
 
         import org.apache.http.HttpEntity;
         import org.apache.http.HttpResponse;
@@ -52,7 +55,7 @@ public class MainActivity extends Activity implements OnClickListener, LocationL
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-        intent = new Intent(this,Result.class);
+        intent = new Intent(this,SelectPlace.class);
        // findViewById(R.id.button).setOnClickListener(this);
        // latituteField = (TextView) findViewById(R.id.latituteField);
       //  longitudeField = (TextView) findViewById(R.id.longitudeField);
@@ -115,6 +118,7 @@ public class MainActivity extends Activity implements OnClickListener, LocationL
     public void onLocationChanged(Location location) {
          lat =  (location.getLatitude());
          lng = (location.getLongitude());
+        Log.i("place",lat+" "+lng);
         lng5 = 1/((111111.0*Math.cos(lng))*5);
        // latituteField.setText(String.valueOf(lat));
         //longitudeField.setText(String.valueOf(lng));
@@ -198,7 +202,7 @@ public class MainActivity extends Activity implements OnClickListener, LocationL
                     while ((line = reader.readLine()) != null)
                     {
                         sb.append(line + "\n");
-                        Log.i("DescEarly", line);
+                      //  Log.i("DescEarly", line);
                     }
                     text = sb.toString();
 
@@ -219,58 +223,45 @@ public class MainActivity extends Activity implements OnClickListener, LocationL
         protected void onPostExecute(String results) {
             if (results!=null) {
                 String stuff = "";
-
+                List<locationObj> places = new ArrayList<locationObj>();
                 try {
                     JSONArray jArray = new JSONArray(results);
-                    double[] coords = new double[jArray.length()*2];
                     //http://stackoverflow.com/questions/9605913/how-to-parse-json-in-android
-                    int extra = jArray.length();
 
+
+
+
+
+
+
+
+                    locationObj curr = new locationObj(jArray.getJSONObject(0).getString("inspection_business_name"));
                     for (int i=0; i < jArray.length(); i++)
                     {
                         try {
 
                             JSONObject oneObject = jArray.getJSONObject(i);
-                            // Pulling items from the array
-                            coords[i] = oneObject.getDouble("latitude");
-                            coords[i+extra] = oneObject.getDouble("longitude");
-
-                        } catch (JSONException e) {
-                            // Oops
-                        }
-                    }
-
-                    double distance = 10000;
-
-                    int marker = 0;
-                    for(int i=0; i < jArray.length(); i++){
-
-                        double tempD = Math.sqrt(Math.pow(lat-coords[i],2)+Math.pow(lng-coords[i+extra],2));
-                        if(tempD<distance){
-                            distance=  tempD;
-                            marker = i;
-                        }
-
-                    }
-                    JSONObject name = jArray.getJSONObject(marker);
-                    String targetName=name.getString("inspection_business_name");
-                    locationObj curr = new locationObj(targetName);
-                    for (int i=0; i < jArray.length(); i++)
-                    {
-                        try {
-
-                            JSONObject oneObject = jArray.getJSONObject(i);
-                            if(oneObject.getString("inspection_business_name").equals(targetName)){
+                           // if(oneObject.getString("inspection_business_name").equals(targetName)){
                                 if(oneObject.has("inspection_date")&&oneObject.has("inspection_result")&&oneObject.has("violation_description")&&oneObject.has("violation_type")){
+                                    if(!curr.getName().equals(oneObject.getString("inspection_business_name"))){
+                                        places.add(curr);
+                                        Log.i("size",curr.getName());
+                                        curr = new locationObj(oneObject.getString("inspection_business_name"));
+                                    }
+
                                     curr.addDate(oneObject.getString("inspection_date"));
                                     curr.addResult(oneObject.getString("inspection_result"));
                                     curr.addDesc(oneObject.getString("violation_description"));
-                                    Log.i("Desc", oneObject.getString("violation_description"));
+                                  //  Log.i("Desc", oneObject.getString("violation_description"));
                                     curr.addType(oneObject.getString("violation_type"));
+                                    double tempLat = oneObject.getDouble("latitude");
+                                    double tempLng = oneObject.getDouble("longitude");
+                                    curr.addDistance(Math.sqrt(Math.pow(lat-tempLat,2)+Math.pow(lng-tempLng,2))/0.000008998719243599958);
+
                                 }
 
 
-                            }
+                            //}
                             // Pulling items from the array
 
 
@@ -278,7 +269,20 @@ public class MainActivity extends Activity implements OnClickListener, LocationL
                             // Oops
                         }
                     }
-                    intent.putExtra("thing",curr);
+                    places.add(curr); //i think this is the one on the end
+                    Log.i("test",places.size()+"");
+                    Collections.sort(places);
+                    Log.i("test",places.size()+"");
+                    Log.i("test",places.get(0).getName());
+                    for(int i = 0;i<places.size()&&i<30;i++){
+                        intent.putExtra("place"+i,places.get(i));
+                    }
+                    if(places.size()<30){
+                        intent.putExtra("size",places.size());
+                    } else{
+                        intent.putExtra("size",30);
+                    }
+
                     startActivity(intent);
                 } catch (JSONException e) {
                     e.printStackTrace();

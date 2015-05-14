@@ -7,5 +7,6 @@
     <string name="title_activity_splash">Splash</string>
     <string name="title_activity_result">Result</string>
     <string name="title_activity_close_places">ClosePlaces</string>
+    <string name="title_activity_select_place">SelectPlace</string>
 
 </resources>

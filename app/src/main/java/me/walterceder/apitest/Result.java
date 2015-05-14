@@ -58,13 +58,16 @@ public class Result extends ListActivity {
 
         for(int i = 0; i< dates.size();i++){
 
-            listItems.add((String)dates.get(i));
-            listItems.add((String)result.get(i));
-            listItems.add((String)desc.get(i));
-            listItems.add((String)type.get(i));
-            adapter.notifyDataSetChanged();
+            listItems.add("Date: "+((String)dates.get(i)).substring(0,10)+"\n"+"Result of inspection: "+
+                            (String)result.get(i)+"\nType of Violation: "+(String)desc.get(i)+
+                            "\nType (Red is worse than blue): "+(String)type.get(i));
+            //listItems.add();
+            //listItems.add("Type of Violation: "+(String)desc.get(i));
+            //listItems.add("Type (Red is worse than blue): "+(String)type.get(i));
+
 
         }
+        adapter.notifyDataSetChanged();
 
     }
 

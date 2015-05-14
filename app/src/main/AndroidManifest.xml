@@ -32,6 +32,10 @@
             android:name=".ClosePlaces"
             android:label="@string/title_activity_close_places" >
         </activity>
+        <activity
+            android:name=".SelectPlace"
+            android:label="@string/title_activity_select_place" >
+        </activity>
     </application>
 
 </manifest>
