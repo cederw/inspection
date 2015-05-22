@@ -54,6 +54,9 @@ public class MainActivity extends Activity implements LocationListener {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        provider = locationManager.getBestProvider(criteria, false);
       // getPlaces();
     }
 
@@ -62,6 +65,7 @@ public class MainActivity extends Activity implements LocationListener {
     @Override
     protected void onResume() {
         super.onResume();
+        locationManager.requestLocationUpdates(provider, 5, 1, this);
         getPlaces();
     }
 
@@ -74,7 +78,7 @@ public class MainActivity extends Activity implements LocationListener {
     @Override
     protected void onPause() {
         super.onPause();
-        locationManager.removeUpdates(this);
+        //locationManager.removeUpdates(this);
     }
     @Override
     public void onLocationChanged(Location location) {
@@ -108,9 +112,7 @@ public class MainActivity extends Activity implements LocationListener {
         // findViewById(R.id.button).setOnClickListener(this);
         // latituteField = (TextView) findViewById(R.id.latituteField);
         //  longitudeField = (TextView) findViewById(R.id.longitudeField);
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-        provider = locationManager.getBestProvider(criteria, false);
+
 
 
 
@@ -123,6 +125,7 @@ public class MainActivity extends Activity implements LocationListener {
             Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
             startActivity(intent);
         }
+
         Location location = locationManager.getLastKnownLocation(provider);
 
         // Initialize the locationObj fields
