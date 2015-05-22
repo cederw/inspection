@@ -28,7 +28,6 @@ package me.walterceder.apitest;
         import android.os.AsyncTask;
         import android.os.Bundle;
         import android.provider.Settings;
-        import android.util.Log;
         import android.view.View;
         import android.view.View.OnClickListener;
         import android.widget.TextView;
@@ -81,7 +80,7 @@ public class MainActivity extends Activity implements LocationListener {
     public void onLocationChanged(Location location) {
          lat =  (location.getLatitude());
          lng = (location.getLongitude());
-        Log.i("place",lat+" "+lng);
+       // Log.i("place",lat+" "+lng);
         lng5 = 1/((111111.0*Math.cos(lng))*5);
        // latituteField.setText(String.valueOf(lat));
         //longitudeField.setText(String.valueOf(lng));
@@ -179,7 +178,7 @@ public class MainActivity extends Activity implements LocationListener {
                 double maxLng = lng-(1.0/169);
                 offset++;
                 String call = "https://data.kingcounty.gov/resource/f29f-zza5.json?$where=latitude%20%3E%20"+minLat+"%20AND%20latitude%20%3C%20"+maxLat+"%20AND%20longitude%20%3C%20"+minLng+"%20AND%20longitude%20%3E%20"+maxLng;
-                Log.i("url",call);
+         //       Log.i("url",call);
                 HttpGet httpGet = new HttpGet(call);
                 try {
 
@@ -241,7 +240,7 @@ public class MainActivity extends Activity implements LocationListener {
                                 if(oneObject.has("inspection_date")&&oneObject.has("inspection_result")&&oneObject.has("violation_description")&&oneObject.has("violation_type")){
                                     if(!curr.getName().equals(oneObject.getString("inspection_business_name"))){
                                         places.add(curr);
-                                        Log.i("size",curr.getName());
+                                      //  Log.i("size",curr.getName());
                                         curr = new locationObj(oneObject.getString("inspection_business_name"));
                                     }
 
@@ -269,10 +268,10 @@ public class MainActivity extends Activity implements LocationListener {
                         }
                     }
                     places.add(curr); //i think this is the one on the end
-                    Log.i("test",places.size()+"");
+                   // Log.i("test",places.size()+"");
                     Collections.sort(places);
-                    Log.i("test",places.size()+"");
-                    Log.i("test",places.get(0).getName());
+                  //  Log.i("test",places.size()+"");
+                   // Log.i("test",places.get(0).getName());
                     for(int i = 0;i<places.size()&&i<30;i++){
                         intent.putExtra("place"+i,places.get(i));
                     }
@@ -317,7 +316,7 @@ public class MainActivity extends Activity implements LocationListener {
                             * Math.sin(dLon / 2) * Math.sin(dLon / 2);
             double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
             double d = r * c;
-            Log.i("Distance",d+"");
+          //  Log.i("Distance",d+"");
             //convert ot m
             return d*1000.0;
         }
@@ -332,7 +331,7 @@ public class MainActivity extends Activity implements LocationListener {
                     dist = dist * 1.609344;
                     //convert to m
                     dist = dist/1000.0;
-                    Log.i("Distance",dist+"");
+              //      Log.i("Distance",dist+"");
             	  return (dist);
             	}
 

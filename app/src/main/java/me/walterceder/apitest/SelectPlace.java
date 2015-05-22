@@ -3,7 +3,6 @@ package me.walterceder.apitest;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -45,12 +44,12 @@ public class SelectPlace extends ListActivity {
                 android.R.layout.simple_list_item_1,
                 listPlaces);
         setListAdapter(adapter);
-        Log.i("size",places.size()+"");
+       // Log.i("size",places.size()+"");
         if(places.get(0)==null){
-            Log.i("size","??? bad");
+       //     Log.i("size","??? bad");
         }
 
-        Log.i("size",places.get(0).getDates().size()+"");
+       // Log.i("size",places.get(0).getDates().size()+"");
 
         for(int i = 0; i<places.size();i++){
             ///0.000008998719243599958
@@ -67,7 +66,7 @@ public class SelectPlace extends ListActivity {
     protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
 
-        Log.i("click",id+"");
+     //   Log.i("click",id+"");
         Intent intent = new Intent(this,Result.class);
         intent.putExtra("thing", places.get((int) id));
         startActivity(intent);

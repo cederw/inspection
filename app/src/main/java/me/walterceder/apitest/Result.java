@@ -50,10 +50,10 @@ public class Result extends ListActivity {
         List result = results.getResults();
         List desc = results.getDesc();
         List type = results.getType();
-        Log.i("dates",dates.size()+"");
-        Log.i("result",result.size()+"");
-        Log.i("desc",desc.size()+"");
-        Log.i("type",type.size()+"");
+      //  Log.i("dates",dates.size()+"");
+     //   Log.i("result",result.size()+"");
+     //   Log.i("desc",desc.size()+"");
+     //   Log.i("type",type.size()+"");
         //sizes are not always the same
 
         for(int i = 0; i< dates.size();i++){

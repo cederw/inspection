@@ -13,7 +13,7 @@ public class ApiTest extends Application{
         if (instance == null) {
             instance = this;
         } else {
-            Log.e("ApiTest", "There is an error beep boop. You tried to create more than 1 the app");
+           // Log.e("ApiTest", "There is an error beep boop. You tried to create more than 1 the app");
         }
     }
 }

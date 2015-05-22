@@ -2,7 +2,6 @@ package me.walterceder.apitest;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -116,7 +115,7 @@ public class locationObj implements Parcelable, Comparable{
     public int compareTo(Object other) {
         double comparedist=((locationObj)other).getDistance();
         /* For Ascending order*/
-        Log.i("dist",this.distance-comparedist+" "+ (int)(this.distance-comparedist));
+       // Log.i("dist",this.distance-comparedist+" "+ (int)(this.distance-comparedist));
         return (int)(this.distance-comparedist);
 
         /* For Descending order do like this */
